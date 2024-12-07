@@ -7,9 +7,12 @@ OS of agentic news.
 make the best AI newsletter covering:
 
 - [x] frontpage hackernews AI posts
-- [ ] trending arxiv.cs AI
+- [x] trending arxiv.cs AI
     - here i am getting the most trending papers from the past 7 days via my current method 
 - [ ] twitter
-- [ ] reddit
+- [x] reddit
 - [ ] discord
 - [ ] daily papers huggingface 
+- [ ] github 
+ 
+once i have github ready i am going to build the frontend i guess. 

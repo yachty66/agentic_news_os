@@ -1,8 +1,3 @@
-"""
-1. go to github trending page
-2. fetch all trending repositories
-3. make ai summary and all the other things
-"""
 import requests
 from bs4 import BeautifulSoup
 from llm import call_llm
@@ -10,6 +5,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os 
 import json
+from process_github_repos import process_github_repos_to_json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -48,6 +44,10 @@ def fetch_github_repos():
             description = repo.select_one('p')
             description = description.text.strip() if description else ""
             
+            # Extract language (new!)
+            language_element = repo.select_one('span[itemprop="programmingLanguage"]')
+            language = language_element.text.strip() if language_element else "Unknown"
+            
             # Get total stars and forks
             stats = repo.select('a.Link--muted')
             stars_total = stats[0].text.strip() if stats else "0"
@@ -70,6 +70,7 @@ def fetch_github_repos():
                 'full_name': full_name,
                 'html_url': html_url,
                 'description': description,
+                'language': language,  # Added language field
                 'total_stars': convert_to_number(stars_total),
                 'stars_today': convert_to_number(stars_today),
                 'forks_count': convert_to_number(forks),
@@ -103,7 +104,7 @@ def get_top_repos_by_stargazers_count(repos, top_n=3):
 
 def extract_ai_repos(github_repos):
     prompt = f"""
-    You are getting as input all of the daily trending github repositories. each repository comes in a JSON containing full_name, html_url, description, total_stars, stars_today and forks_count.
+    You are getting as input all of the daily trending github repositories. each repository comes in a JSON containing full_name, html_url, description, language, total_stars, stars_today and forks_count.
 
     We are curating data for an AI newsletter in which we want to add information about all of those repositories. Because of that, your goal is it to find and return all the GitHub repositories that have something to do with AI.
 
@@ -121,6 +122,7 @@ def extract_ai_repos(github_repos):
                 "full_name": "full_name",
                 "html_url": "html_url", 
                 "description": "description",
+                "language": "language",
                 "total_stars": "total_stars",
                 "stars_today": "stars_today",
                 "forks_count": "forks_count"
@@ -129,6 +131,7 @@ def extract_ai_repos(github_repos):
                 "full_name": "full_name",
                 "html_url": "html_url", 
                 "description": "description",
+                "language": "language",
                 "total_stars": "total_stars",
                 "stars_today": "stars_today",
                 "forks_count": "forks_count"
@@ -149,6 +152,14 @@ def extract_ai_repos(github_repos):
     )
     return json.loads(response.choices[0].message.content)["result"]
 
+
+def add_github_repos_to_database(repos_data):
+    data = {
+        "posts": repos_data,
+    }
+    supabase.table("agentic_news_github").insert(data).execute()
+
+
 if __name__ == "__main__":
     repos = fetch_github_repos()
     
@@ -157,13 +168,18 @@ if __name__ == "__main__":
         f"""Repository: {repo['full_name']}
 URL: {repo['html_url']}
 Description: {repo['description']}
+Language: {repo['language']}
 Total Stars: {repo['total_stars']}
 Stars Today: {repo['stars_today']}
 Forks: {repo['forks_count']}"""
         for repo in repos
     ])
     
-    # Feed the formatted repos to extract_ai_repos
     ai_repos = extract_ai_repos(formatted_repos)
+    repos_data = process_github_repos_to_json(ai_repos)
+    
+    print("Repos data:", repos_data)
 
-    print(ai_repos)
+    add_github_repos_to_database(repos_data)
+
+    print("Done!")

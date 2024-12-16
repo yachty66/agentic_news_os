@@ -13,6 +13,6 @@ make the best AI newsletter covering:
 - [x] reddit
 - [ ] discord
 - [ ] daily papers huggingface 
-- [ ] github 
+- [x] github 
  
 once i have github ready i am going to build the frontend i guess. 

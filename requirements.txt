@@ -22,8 +22,8 @@ treelib
 boto3
 
 # API clients
+arxiv    # Changed back to 'arxiv'
 praw    # for Reddit
-arxiv-python   # for arXiv
 
 # Optional but recommended
 pytest   # for testing

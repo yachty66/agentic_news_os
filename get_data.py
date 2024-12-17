@@ -1,10 +1,10 @@
-from arxiv.arxivnews import main as arxiv_main
+from arxivnews.arxivnews import main as arxivnews_main
 from github.github import main as github_main
 from hackernews.hackernews import main as hackernews_main
 from reddit.reddit import main as reddit_main
 
 def run_arxiv_news():
-    arxiv_main()
+    arxivnews_main()
 
 def run_github_news():
     github_main()

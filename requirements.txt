@@ -1,0 +1,29 @@
+# Core dependencies
+python-dotenv
+requests
+supabase
+resend
+
+# LLM related
+litellm
+tiktoken
+
+# Web scraping and parsing
+beautifulsoup4
+playwright
+
+# PDF and document processing
+PyMuPDF  # for fitz
+Pillow   # for PIL/Image
+
+# Git and visualization
+GitPython
+treelib
+boto3
+
+# API clients
+praw    # for Reddit
+arxiv   # for arXiv
+
+# Optional but recommended
+pytest   # for testing

@@ -1,0 +1,48 @@
+name: Daily Newsletter
+
+on:
+  schedule:
+    # Runs at 5 PM Vancouver time (UTC-7/8)
+    # During PDT (Mar-Nov): Vancouver is UTC-7, so run at 00:00 UTC (next day)
+    # During PST (Nov-Mar): Vancouver is UTC-8, so run at 01:00 UTC (next day)
+    - cron: "0 0 * * *" # Adjust based on daylight savings time
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install
+
+      - name: Run newsletter script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+          MENDELEY_REFRESH_TOKEN: ${{ secrets.MENDELEY_REFRESH_TOKEN }}
+          MENDELEY_CLIENT_ID: ${{ secrets.MENDELEY_CLIENT_ID }}
+          MENDELEY_CLIENT_SECRET: ${{ secrets.MENDELEY_CLIENT_SECRET }}
+          MENDELEY_CODE: ${{ secrets.MENDELEY_CODE }}
+        run: python app.py

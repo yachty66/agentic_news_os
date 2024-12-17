@@ -14,10 +14,3 @@ def run_hackernews_news():
 
 def run_reddit_news():
     main()
-
-if __name__ == "__main__":
-    #this should add all the new data to database
-    run_arxiv_news()
-    run_github_news()
-    run_hackernews_news()
-    run_reddit_news()

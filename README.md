@@ -16,3 +16,8 @@ make the best AI newsletter covering:
 - [x] github 
  
 once i have github ready i am going to build the frontend i guess. 
+
+- [ ] make the script be running every day with github action
+- [ ] make sure the footer section is synced with the right links
+- [ ] enable stripe in live mode
+- [ ] share with friends   

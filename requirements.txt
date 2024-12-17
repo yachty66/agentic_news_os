@@ -23,7 +23,7 @@ boto3
 
 # API clients
 praw    # for Reddit
-arxiv   # for arXiv
+arxiv-python   # for arXiv
 
 # Optional but recommended
 pytest   # for testing

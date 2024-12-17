@@ -1,7 +1,7 @@
-from arxiv.arxivnews import main
-from github.github import main
-from hackernews.hackernews import main
-from reddit.reddit import main
+from arxivnews import main
+from githubnews import main
+from hackernews import main
+from reddit import main
 
 def run_arxiv_news():
     main()

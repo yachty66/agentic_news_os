@@ -159,8 +159,7 @@ def add_github_repos_to_database(repos_data):
     }
     supabase.table("agentic_news_github").insert(data).execute()
 
-
-if __name__ == "__main__":
+def main():
     repos = fetch_github_repos()
     
     # Create a formatted string of repos with clear separation
@@ -183,3 +182,8 @@ Forks: {repo['forks_count']}"""
     add_github_repos_to_database(repos_data)
 
     print("Done!")
+
+
+
+if __name__ == "__main__":
+    main()

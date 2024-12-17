@@ -109,8 +109,8 @@ def add_reddit_news_to_database(ai_posts):
     except Exception as e:
         print(f"Error adding posts to database: {e}")
         return None
-
-if __name__ == "__main__":
+    
+def main():
     # List of subreddits to monitor
     subreddits = [
         "MachineLearning",
@@ -148,3 +148,6 @@ if __name__ == "__main__":
             continue
     
     add_reddit_news_to_database(all_posts)
+
+if __name__ == "__main__":
+    main()

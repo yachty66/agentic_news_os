@@ -93,15 +93,12 @@ def add_arxiv_news_to_database(ai_posts):
     except Exception as e:
         print(f"Error adding posts to database: {e}")
         return None
-
-####generate the email
-if __name__ == "__main__":
-    # Fetch papers
+    
+def main():
     papers = fetch_arxiv_data()
-
     top_three_papers = get_top_three_papers_by_reader_count(papers)
-
-    # Process papers to get enriched JSON data
     papers_json = process_arxiv_papers_to_json(top_three_papers)
-
     add_arxiv_news_to_database(papers_json)
+
+if __name__ == "__main__":
+    main()

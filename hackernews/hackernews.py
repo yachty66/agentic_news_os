@@ -94,8 +94,11 @@ def add_ai_news_to_database(ai_posts):
         print(f"Error adding posts to database: {e}")
         return None
 
-if __name__ == "__main__":
+def main():
     stories = get_hackernews_frontpage()
     ai_posts = extract_ai_news(stories)
     add_ai_news_to_database(ai_posts)
     print("ai_posts:", ai_posts)
+
+if __name__ == "__main__":
+    main()

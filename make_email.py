@@ -1,11 +1,11 @@
-"""
-need to iterate over all of the supabase tables and create the email from it.
-"""
 from supabase import create_client
+import resend 
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import os 
+from llm import call_llm
+import json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,6 +15,8 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 def get_latest_news():
     try:
@@ -290,17 +292,110 @@ def create_html_email(news_data):
     
     return email_html
 
+def make_email_subject_and_summary(ai_news):
+    prompt = f"""
+    You are getting as input daily ai news from different news platforms. 
+
+    you need to find a good email subject and a short one sentence summary for the content which i can use a email title and the summary is used online for the blog.
+
+    Here are all of the AI news:
+
+    ---
+    {ai_news}
+    ---
+
+    You need to return your result containing the title and the summary in JSON format like this:
+
+    {{
+        "result": [
+            {{
+                "title": "title",
+                "summary": "summary"
+            }}
+        ]
+    }}
+
+    Return in JSON:
+    """
+
+    response = call_llm(
+        model="gpt-4o-mini",
+        response_format={"type": "json_object"},
+        temperature=0.0,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    ai_news_json = json.loads(response.choices[0].message.content)["result"]
+    title = "Agentic News: " + ai_news_json[0]["title"]
+    summary = ai_news_json[0]["summary"]
+    return title, summary
+
+def add_email_to_database(title, summary, email_html):
+    try:
+        supabase.table('agentic_news_email').insert({
+            "title": title,
+            "summary": summary,
+            "email": email_html
+        }).execute()
+        print("Successfully inserted news into database")
+    except Exception as e:
+        print(f"Error inserting into database: {e}")
+
+def get_subscribers():
+    try:
+        response = supabase.table('subscriptions').select('email').execute()
+        return [record['email'] for record in response.data]
+    except Exception as e:
+        print(f"Error fetching subscribers: {e}")
+        return []
+
+def send_email_to_subscribers(html_content, title):
+    # footer_message = """
+    # <div style="background-color: #0084C7; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+    #     <p>Manage your subscription <a href="https://billing.stripe.com/p/login/8wM6sgbLWa0DaSQ8ww" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline;">here</a>.</p>
+    #     <p>To change your categories, please reply to this email with your preferences.</p>
+    # </div>
+    # """
+    
+    wrapped_html_content = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f3f8fa;">
+        {html_content}
+    </div>
+    """
+
+    subscribers = get_subscribers()
+    if not subscribers:
+        print("No subscribers found")
+        return
+
+    for subscriber_email in subscribers:
+        params = {
+            "from": "Agentic News <newsletter@pantheon.so>",
+            "to": [subscriber_email],
+            "subject": title,
+            "html": wrapped_html_content,
+        }
+
+        try:
+            email = resend.Emails.send(params)
+            print(f"Email sent successfully to {subscriber_email}: {email}")
+        except Exception as e:
+            print(f"Error sending email to {subscriber_email}: {e}")
+
 def main():
     news = get_latest_news()
     email_html = create_html_email(news)
-    print(email_html)
-    # You can then send this using Resend
-    # resend.emails.send({
-    #     "from": "onboarding@resend.dev",
-    #     "to": "your@email.com",
-    #     "subject": "AI News Digest",
-    #     "html": email_html
-    # })
+    title, summary = make_email_subject_and_summary(news)
+    print("news", news)
+    print("email_html", email_html)
+    print("title", title)
+    print("summary", summary)
+    # Call the function to add data to database
+    add_email_to_database(
+        title=title,
+        summary=summary,
+        email_html=email_html
+    )
+    send_email_to_subscribers(email_html, title)
 
 if __name__ == "__main__":
     main()

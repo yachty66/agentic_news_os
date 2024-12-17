@@ -9,10 +9,6 @@ https://www.reddit.com/r/StableDiffusion/
 https://www.reddit.com/r/LocalLLaMA/
 https://www.reddit.com/r/ClaudeAI/
 https://www.reddit.com/r/perplexity_ai/
-
-
-my idea is to take the top post for each sub per day and then have this post summarisedd 
-
 """
 import praw
 from datetime import datetime, timedelta

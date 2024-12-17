@@ -5,7 +5,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os 
 import json
-from process_github_repos import process_github_repos_to_json
+from .process_github_repos import process_github_repos_to_json
 
 # Load environment variables from .env file
 load_dotenv()

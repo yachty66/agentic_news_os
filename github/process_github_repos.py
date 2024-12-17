@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 import boto3
 from llm import call_llm
 from botocore.exceptions import NoCredentialsError
-from make_github_graph import get_graph_url
-from make_ai_content import get_ai_content
+from .make_github_graph import get_graph_url
+from .make_ai_content import get_ai_content
 from playwright.sync_api import sync_playwright
 import boto3
 import os

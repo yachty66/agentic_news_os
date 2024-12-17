@@ -1,7 +1,7 @@
 import arxiv
 from datetime import datetime, timedelta
-from get_mendeley_reader_counts import add_reader_counts
-from generate_arxivnews_json import process_arxiv_papers_to_json
+from .get_mendeley_reader_counts import add_reader_counts
+from .generate_arxivnews_json import process_arxiv_papers_to_json
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv

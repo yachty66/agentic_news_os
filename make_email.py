@@ -325,7 +325,7 @@ def make_email_subject_and_summary(ai_news):
         messages=[{"role": "user", "content": prompt}]
     )
     ai_news_json = json.loads(response.choices[0].message.content)["result"]
-    title = "Agentic News: " + ai_news_json[0]["title"]
+    title = ai_news_json[0]["title"]
     summary = ai_news_json[0]["summary"]
     return title, summary
 
@@ -395,7 +395,7 @@ def main():
         summary=summary,
         email_html=email_html
     )
-    send_email_to_subscribers(email_html, title)
+    send_email_to_subscribers(email_html, "Agentic News: " + title)
 
 if __name__ == "__main__":
     main()

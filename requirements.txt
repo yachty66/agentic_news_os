@@ -27,3 +27,4 @@ praw    # for Reddit
 
 # Optional but recommended
 pytest   # for testing
+replicate

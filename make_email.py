@@ -6,10 +6,17 @@ from dotenv import load_dotenv
 import os 
 from llm import call_llm
 import json
+import replicate
+import boto3
+import io
+from botocore.exceptions import NoCredentialsError
+import uuid
 
 # Load environment variables from .env file
 load_dotenv()
 
+# Set Replicate API token
+os.environ["REPLICATE_API_TOKEN"] = os.getenv("REPLICATE_API_TOKEN")
 # Load environment variables for Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -329,12 +336,13 @@ def make_email_subject_and_summary(ai_news):
     summary = ai_news_json[0]["summary"]
     return title, summary
 
-def add_email_to_database(title, summary, email_html):
+def add_email_to_database(title, summary, email_html, image):
     try:
         supabase.table('agentic_news_email').insert({
             "title": title,
             "summary": summary,
-            "email": email_html
+            "email": email_html,
+            "image": image
         }).execute()
         print("Successfully inserted news into database")
     except Exception as e:
@@ -381,19 +389,60 @@ def send_email_to_subscribers(html_content, title):
         except Exception as e:
             print(f"Error sending email to {subscriber_email}: {e}")
 
+
+def make_image(title):
+    # Generate image using Replicate
+    input = {
+        "prompt": title,
+        "prompt_upsampling": True
+    }
+
+    output = replicate.run(
+        "black-forest-labs/flux-1.1-pro",
+        input=input
+    )
+    
+    # Read the image content
+    image_content = output.read()
+    
+    # Generate unique filename
+    unique_id = str(uuid.uuid4())
+    object_name = f"output_{unique_id}.jpg"
+    
+    # Upload to S3
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.upload_fileobj(
+            io.BytesIO(image_content), 
+            'arxivgptnewsletter',  # your S3 bucket name
+            object_name
+        )
+        print(f"Upload Successful: {object_name}")
+        return f"https://arxivgptnewsletter.s3.amazonaws.com/{object_name}"
+    except NoCredentialsError:
+        print("Credentials not available")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+        
+
 def main():
     news = get_latest_news()
     email_html = create_html_email(news)
     title, summary = make_email_subject_and_summary(news)
+    image = make_image(title)
     print("news", news)
     print("email_html", email_html)
     print("title", title)
     print("summary", summary)
+    print("image", image)
     # Call the function to add data to database
     add_email_to_database(
         title=title,
         summary=summary,
-        email_html=email_html
+        email_html=email_html,
+        image=image
     )
     send_email_to_subscribers(email_html, "Agentic News: " + title)
 

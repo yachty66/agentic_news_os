@@ -45,4 +45,5 @@ jobs:
           MENDELEY_CLIENT_ID: ${{ secrets.MENDELEY_CLIENT_ID }}
           MENDELEY_CLIENT_SECRET: ${{ secrets.MENDELEY_CLIENT_SECRET }}
           MENDELEY_CODE: ${{ secrets.MENDELEY_CODE }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
         run: python app.py

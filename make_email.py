@@ -458,4 +458,6 @@ def main():
     send_email_to_subscribers(email_html, "Agentic News: " + title)
 
 if __name__ == "__main__":
-    main()
+    # main()
+    image=make_image("a woman with a cat")
+    print("image", image)

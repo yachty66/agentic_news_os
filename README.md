@@ -23,3 +23,4 @@ once i have github ready i am going to build the frontend i guess.
 - [ ] enable stripe in live mode
 - [ ] port all existing subscriptions to the new newsletter
 - [ ] share with friends
+

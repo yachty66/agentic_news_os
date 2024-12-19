@@ -15,8 +15,6 @@ import uuid
 # Load environment variables from .env file
 load_dotenv()
 
-# Set Replicate API token
-os.environ["REPLICATE_API_TOKEN"] = os.getenv("REPLICATE_API_TOKEN")
 # Load environment variables for Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -391,39 +389,52 @@ def send_email_to_subscribers(html_content, title):
 
 
 def make_image(title):
+    # Check if token is available
+    replicate_token = os.getenv("REPLICATE_API_TOKEN")
+    if not replicate_token:
+        print("Warning: REPLICATE_API_TOKEN not found")
+        return None
+        
+    # Set token explicitly
+    os.environ["REPLICATE_API_TOKEN"] = replicate_token
+    
     # Generate image using Replicate
     input = {
         "prompt": title,
         "prompt_upsampling": True
     }
 
-    output = replicate.run(
-        "black-forest-labs/flux-1.1-pro",
-        input=input
-    )
-    
-    # Read the image content
-    image_content = output.read()
-    
-    # Generate unique filename
-    unique_id = str(uuid.uuid4())
-    object_name = f"output_{unique_id}.jpg"
-    
-    # Upload to S3
-    s3_client = boto3.client('s3')
     try:
-        s3_client.upload_fileobj(
-            io.BytesIO(image_content), 
-            'arxivgptnewsletter',  # your S3 bucket name
-            object_name
+        output = replicate.run(
+            "black-forest-labs/flux-1.1-pro",
+            input=input
         )
-        print(f"Upload Successful: {object_name}")
-        return f"https://arxivgptnewsletter.s3.amazonaws.com/{object_name}"
-    except NoCredentialsError:
-        print("Credentials not available")
-        return None
+        
+        # Read the image content
+        image_content = output.read()
+        
+        # Generate unique filename
+        unique_id = str(uuid.uuid4())
+        object_name = f"output_{unique_id}.jpg"
+        
+        # Upload to S3
+        s3_client = boto3.client('s3')
+        try:
+            s3_client.upload_fileobj(
+                io.BytesIO(image_content), 
+                'arxivgptnewsletter',  
+                object_name
+            )
+            print(f"Upload Successful: {object_name}")
+            return f"https://arxivgptnewsletter.s3.amazonaws.com/{object_name}"
+        except NoCredentialsError:
+            print("AWS Credentials not available")
+            return None
+        except Exception as e:
+            print(f"An S3 error occurred: {e}")
+            return None
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"A Replicate error occurred: {e}")
         return None
         
 

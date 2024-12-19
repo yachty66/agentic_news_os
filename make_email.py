@@ -299,9 +299,11 @@ def create_html_email(news_data):
 
 def make_email_subject_and_summary(ai_news):
     prompt = f"""
-    You are getting as input daily ai news from different news platforms. 
+    You are receiving daily AI news from different news platforms.
 
-    you need to find a good email subject and a short one sentence summary for the content which i can use a email title and the summary is used online for the blog.
+    You need to find a good email subject and a short one-sentence summary for the content that I can use as an email title, and the summary will be used online for the blog.
+
+    The subject should include up to three different keywords that appear in the news, such as "o1 API, 4o/4o-mini in Realtime API + WebRTC, DPO Finetuning."
 
     Here are all of the AI news:
 
@@ -455,7 +457,7 @@ def main():
         email_html=email_html,
         image=image
     )
-    send_email_to_subscribers(email_html, "Agentic News: " + title)
+    send_email_to_subscribers(email_html, title)
 
 if __name__ == "__main__":
     # main()

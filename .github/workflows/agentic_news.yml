@@ -2,10 +2,10 @@ name: Daily Newsletter
 
 on:
   schedule:
-    # Runs at 5 PM Vancouver time (UTC-7/8)
-    # During PDT (Mar-Nov): Vancouver is UTC-7, so run at 00:00 UTC (next day)
-    # During PST (Nov-Mar): Vancouver is UTC-8, so run at 01:00 UTC (next day)
-    - cron: "0 0 * * *" # Adjust based on daylight savings time
+    # Runs at 8:00 AM San Francisco time
+    # During PDT (Mar-Nov): SF is UTC-7, so run at 15:00 UTC
+    # During PST (Nov-Mar): SF is UTC-8, so run at 16:00 UTC
+    - cron: "0 16 * * *" # 8:00 AM PT winter time
   workflow_dispatch: # Allows manual trigger
 
 jobs:

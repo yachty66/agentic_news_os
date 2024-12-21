@@ -461,5 +461,5 @@ def main():
 
 if __name__ == "__main__":
     # main()
-    image=make_image("a woman with a cat")
+    image=make_image("Recent advancements in AI include the introduction of ModernBERT for efficient long-context processing, concerns over alignment faking in large language models, and a new dataset for humanoid robot pose control leveraging massive human videos.")
     print("image", image)
